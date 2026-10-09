@@ -3,7 +3,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-TOKEN = os.getenv("DISCORD_TOKEN")
+TOKEN = "MTU1MTU2MDAyMzQ1MTExNTYwMQ.G-QnAE.K-cSuM8BxLjVASgdeO8vlTanf_cnJBeIJuDk0c"
 
 CAPT_ROLE_IDS = {
     1374223820453580800, 1368922573315768332,
@@ -183,7 +183,6 @@ class ApplicationModal(discord.ui.Modal, title="Заявка"):
                 ephemeral=True,
             )
 
-
 class RejectModal(discord.ui.Modal, title="Причина отказа"):
     reason = discord.ui.TextInput(
         label="Причина",
@@ -210,11 +209,28 @@ class RejectModal(discord.ui.Modal, title="Причина отказа"):
 
         results = get_channel(guild, RESULTS_CHANNEL_ID, discord.TextChannel)
         if results:
-            await results.send(
-                f"Заявка {applicant.mention if applicant else self.applicant_id} "
-                f"отклонена модератором {interaction.user.mention}.\n"
-                f"Причина: {self.reason.value}"
+            embed = discord.Embed(
+                title="❌ Заявка отклонена",
+                color=discord.Color.red(),
+                timestamp=discord.utils.utcnow(),
             )
+            embed.add_field(
+                name="👤 Заявитель",
+                value=applicant.mention if applicant else f"<@{self.applicant_id}>",
+                inline=False,
+            )
+            embed.add_field(
+                name="🛡️ Модератор",
+                value=interaction.user.mention,
+                inline=False,
+            )
+            embed.add_field(
+                name="📝 Причина отказа",
+                value=self.reason.value,
+                inline=False,
+            )
+            embed.set_footer(text="Система рассмотрения заявок")
+            await results.send(embed=embed)
 
         await interaction.followup.send("Заявка отклонена.", ephemeral=True)
 
@@ -236,7 +252,7 @@ class ApplicationView(BaseView):
             return False
         return True
 
-    @discord.ui.button(label="Принять", style=discord.ButtonStyle.success)
+    @discord.ui.button(label="Принять", emoji="✅", style=discord.ButtonStyle.success)
     async def accept(self, interaction, button):
         await interaction.response.defer(ephemeral=True)
         guild = interaction.guild
@@ -244,16 +260,29 @@ class ApplicationView(BaseView):
 
         if applicant:
             try:
-                await applicant.send("Ваша заявка принята!")
+                await applicant.send("✅ Ваша заявка принята!")
             except discord.HTTPException:
                 pass
 
         results = get_channel(guild, RESULTS_CHANNEL_ID, discord.TextChannel)
         if results:
-            await results.send(
-                f"Заявка {applicant.mention if applicant else self.applicant_id} "
-                f"принята {interaction.user.mention}."
+            embed = discord.Embed(
+                title="✅ Заявка принята",
+                color=discord.Color.green(),
+                timestamp=discord.utils.utcnow(),
             )
+            embed.add_field(
+                name="👤 Заявитель",
+                value=applicant.mention if applicant else f"<@{self.applicant_id}>",
+                inline=False,
+            )
+            embed.add_field(
+                name="🛡️ Модератор",
+                value=interaction.user.mention,
+                inline=False,
+            )
+            embed.set_footer(text="Система рассмотрения заявок")
+            await results.send(embed=embed)
 
         await interaction.followup.send("Заявка принята.", ephemeral=True)
 
@@ -263,12 +292,13 @@ class ApplicationView(BaseView):
             except discord.HTTPException:
                 pass
 
-    @discord.ui.button(label="Отклонить", style=discord.ButtonStyle.danger)
+    @discord.ui.button(label="Отклонить", emoji="❌", style=discord.ButtonStyle.danger)
     async def reject(self, interaction, button):
         await interaction.response.send_modal(RejectModal(self.applicant_id))
 
     @discord.ui.button(
         label="Вызвать на обзвон",
+        emoji="📞",
         style=discord.ButtonStyle.primary,
     )
     async def call(self, interaction, button):
@@ -299,7 +329,7 @@ class ApplicationView(BaseView):
             if applicant and isinstance(voice, discord.VoiceChannel):
                 try:
                     await applicant.send(
-                        f"Вас вызывают на обзвон в голосовой канал **{voice.name}**."
+                        f"📞 Вас вызывают на обзвон в голосовой канал **{voice.name}**."
                     )
                 except discord.HTTPException:
                     pass
@@ -316,7 +346,6 @@ class ApplicationView(BaseView):
             view=view,
             ephemeral=True,
         )
-
 
 @bot.tree.command(name="zayavka", description="Создать панель подачи заявок")
 async def zayavka(interaction):
@@ -702,9 +731,6 @@ async def main():
         bot.add_view(PortfolioPanelView())
         await bot.start(TOKEN)
 
-
-async def main():
-    await bot.start(TOKEN)
 
 if __name__ == "__main__":
     import asyncio
