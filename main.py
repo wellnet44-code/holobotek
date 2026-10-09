@@ -3,7 +3,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-TOKEN = "MTU1MTU2MDAyMzQ1MTExNTYwMQ.G-QnAE.K-cSuM8BxLjVASgdeO8vlTanf_cnJBeIJuDk0c"
+TOKEN = os.getenv("DISCORD_TOKEN")
 
 CAPT_ROLE_IDS = {
     1374223820453580800, 1368922573315768332,
