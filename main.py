@@ -9,7 +9,7 @@ from discord import app_commands
 from discord.ext import commands
 
 
-TOKEN = ("MTU1MTU2MDAyMzQ1MTExNTYwMQ.GtGHCK.LcZA1g-xwBv7aGPx3ztjDEricy2AfgiwpHtiUU")
+TOKEN = "MTU1MTU2MDAyMzQ1MTExNTYwMQ.GDymI-.QoRFdkbWBluQjaoL_hrG6uEIWCKICctMTJMqj8"
 
 APPLICATION_BANNER_URL = (
     "https://i.pinimg.com/736x/43/4f/65/434f65e5776197e3e48a37eaeeecc45e.jpg"
